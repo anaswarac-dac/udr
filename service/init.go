@@ -30,7 +30,7 @@ import (
 	"github.com/omec-project/udr/util"
 	"github.com/omec-project/util/http2_util"
 	utilLogger "github.com/omec-project/util/logger"
-	"github.com/urfave/cli/v3"
+	"github.com/urfave/cli"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
@@ -47,7 +47,7 @@ type (
 var config Config
 
 var udrCLi = []cli.Flag{
-	&cli.StringFlag{
+	cli.StringFlag{
 		Name:     "cfg",
 		Usage:    "udr config file",
 		Required: true,
@@ -58,7 +58,7 @@ func (*UDR) GetCliCmd() (flags []cli.Flag) {
 	return udrCLi
 }
 
-func (udr *UDR) Initialize(c *cli.Command) error {
+func (udr *UDR) Initialize(c *cli.Context) error {
 	config = Config{
 		cfg: c.String("cfg"),
 	}
@@ -121,9 +121,9 @@ func (udr *UDR) setLogLevel() {
 	}
 }
 
-func (udr *UDR) FilterCli(c *cli.Command) (args []string) {
+func (udr *UDR) FilterCli(c *cli.Context) (args []string) {
 	for _, flag := range udr.GetCliCmd() {
-		name := flag.Names()[0]
+		name := flag.GetName()
 		value := fmt.Sprint(c.Generic(name))
 		if value == "" {
 			continue
@@ -203,7 +203,7 @@ func (udr *UDR) Start() {
 	}
 }
 
-func (udr *UDR) Exec(c *cli.Command) error {
+func (udr *UDR) Exec(c *cli.Context) error {
 	// UDR.Initialize(cfgPath, c)
 	logger.InitLog.Debugln("args:", c.String("cfg"))
 	args := udr.FilterCli(c)

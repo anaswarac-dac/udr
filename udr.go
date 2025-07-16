@@ -5,31 +5,30 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
 	"github.com/omec-project/udr/logger"
 	"github.com/omec-project/udr/service"
-	"github.com/urfave/cli/v3"
+	"github.com/urfave/cli"
 )
 
 var UDR = &service.UDR{}
 
 func main() {
-	app := &cli.Command{}
+	app := cli.NewApp()
 	app.Name = "udr"
 	logger.AppLog.Infoln(app.Name)
 	app.Usage = "Unified Data Repository"
 	app.UsageText = "udr -cfg <udr_config_file.conf>"
 	app.Action = action
 	app.Flags = UDR.GetCliCmd()
-	if err := app.Run(context.Background(), os.Args); err != nil {
+	if err := app.Run(os.Args); err != nil {
 		logger.AppLog.Fatalf("UDR run error: %v", err)
 	}
 }
 
-func action(ctx context.Context, c *cli.Command) error {
+func action(c *cli.Context) error {
 	if err := UDR.Initialize(c); err != nil {
 		logger.CfgLog.Errorf("%+v", err)
 		return fmt.Errorf("failed to initialize")
